@@ -1,6 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-industrial-950: #07080a;
+  --color-industrial-900: #0e1014;
+  --color-industrial-850: #161920;
+  --color-industrial-800: #161920;
+  --color-industrial-750: #212530;
+  --color-industrial-700: #212530;
+  --color-industrial-600: #2c3240;
+  --color-industrial-500: #434b5c;
+  --color-industrial-400: #647087;
+  --color-industrial-300: #94a1b8;
+  --color-industrial-100: #e2e8f0;
+
+  --color-alarm-red: #ef4444;
+  --color-alarm-amber: #f59e0b;
+  --color-alarm-green: #10b981;
+  --color-alarm-purple: #8b5cf6;
+  --color-alarm-blue: #3b82f6;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', 'monospace';
+}
 
 .react-flow__renderer {
   background-color: #07080a;
