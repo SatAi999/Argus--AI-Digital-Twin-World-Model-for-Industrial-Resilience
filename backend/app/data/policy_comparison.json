@@ -1,0 +1,42 @@
+{
+  "do_nothing": {
+    "mean_reward": -170.1,
+    "final_resilience": 64.1,
+    "cascade_risk": 84.0,
+    "financial_loss": 1840000.0,
+    "intervention_cost": 0.0,
+    "safety_ratio": 0.0
+  },
+  "random": {
+    "mean_reward": -21.2,
+    "final_resilience": 82.1,
+    "cascade_risk": 17.9,
+    "financial_loss": 429900.0,
+    "intervention_cost": 1174000.0,
+    "safety_ratio": 100.0
+  },
+  "rule_based": {
+    "mean_reward": 66.3,
+    "final_resilience": 79.8,
+    "cascade_risk": 20.2,
+    "financial_loss": 49000.0,
+    "intervention_cost": 170000.0,
+    "safety_ratio": 100.0
+  },
+  "greedy_optimizer": {
+    "mean_reward": 63.8,
+    "final_resilience": 77.4,
+    "cascade_risk": 22.6,
+    "financial_loss": 49000.0,
+    "intervention_cost": 150000.0,
+    "safety_ratio": 100.0
+  },
+  "argus_rl": {
+    "mean_reward": 63.8,
+    "final_resilience": 77.4,
+    "cascade_risk": 22.6,
+    "financial_loss": 49000.0,
+    "intervention_cost": 150000.0,
+    "safety_ratio": 100.0
+  }
+}

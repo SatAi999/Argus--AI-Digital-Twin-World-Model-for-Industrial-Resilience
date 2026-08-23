@@ -1,0 +1,14 @@
+{
+  "precision": 0.8461025982678214,
+  "recall": 0.7577565632458234,
+  "f1": 0.7994963802329241,
+  "roc_auc": 0.9720520682632854,
+  "confusion_matrix": {
+    "true_negatives": 9093,
+    "false_positives": 231,
+    "false_negatives": 406,
+    "true_positives": 1270
+  },
+  "dataset_size": 55000,
+  "test_size": 11000
+}
