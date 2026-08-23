@@ -67,10 +67,40 @@ export default function Layout({
           </nav>
         </div>
 
-        {/* Resilience Widget & Reset Controls */}
+        {/* Dynamic Industrial Widgets & Reset Controls */}
         <div className="p-4 border-t border-industrial-800/50 flex flex-col gap-3">
+          
+          {/* Interlocking Gears Animation Widget */}
+          <div className="bg-industrial-950/60 p-3.5 border border-industrial-800/85 rounded-md flex items-center gap-3.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)] overflow-hidden relative group">
+            <svg className="w-12 h-12 shrink-0 text-slate-650" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
+              {/* Gear 1: Large (Clockwise Slow) */}
+              <g className="animate-spin-slow origin-[35px_55px]">
+                <circle cx="35" cy="55" r="16" strokeDasharray="4 2" />
+                <circle cx="35" cy="55" r="11" />
+                <circle cx="35" cy="55" r="5" />
+              </g>
+              {/* Gear 2: Medium (Counter-Clockwise Medium) */}
+              <g className="animate-spin-reverse origin-[68px_60px] text-alarm-purple/60">
+                <circle cx="68" cy="60" r="13" strokeDasharray="3 2" />
+                <circle cx="68" cy="60" r="8" />
+                <circle cx="68" cy="60" r="4" />
+              </g>
+              {/* Gear 3: Small (Clockwise Fast) */}
+              <g className="animate-spin-fast origin-[52px_28px] text-slate-500">
+                <circle cx="52" cy="28" r="9" strokeDasharray="2 1.5" />
+                <circle cx="52" cy="28" r="5" />
+                <circle cx="52" cy="28" r="2.5" />
+              </g>
+            </svg>
+            <div className="flex flex-col font-mono">
+              <span className="text-[8px] text-slate-500 font-bold tracking-widest uppercase">MECHANICAL KINEMATICS</span>
+              <span className="text-[10px] text-slate-350 font-bold mt-0.5">DRIVE SYSTEM: OK</span>
+              <span className="text-[8px] text-slate-500 uppercase mt-0.5 animate-pulse">Telemetry synced</span>
+            </div>
+          </div>
+
           <div className="bg-industrial-950/60 p-4 border border-industrial-800/80 rounded-md shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
-            <span className="text-[9px] text-slate-500 font-bold block mb-1 uppercase tracking-wider">PLANT RESILIENCE</span>
+            <span className="text-[9px] text-slate-550 font-bold block mb-1 uppercase tracking-wider text-slate-500">PLANT RESILIENCE</span>
             <div className="flex items-baseline gap-1.5">
               <span className={`text-3xl font-bold font-mono tracking-tight ${
                 resilienceScore > 75 ? 'text-alarm-green' : resilienceScore > 40 ? 'text-alarm-amber' : 'text-alarm-red'
@@ -81,9 +111,9 @@ export default function Layout({
           
           <button
             onClick={onReset}
-            className="w-full py-2.5 border border-industrial-800 bg-industrial-850 hover:bg-industrial-800 active:bg-industrial-850 rounded-md text-[10px] font-bold tracking-widest font-mono text-center flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 shadow-sm transition-all duration-200"
+            className="w-full py-2.5 border border-industrial-800 bg-industrial-850 hover:bg-industrial-800 active:bg-industrial-850 rounded-md text-[10px] font-bold tracking-widest font-mono text-center flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 shadow-sm transition-all duration-200 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className="w-3.5 h-3.5 animate-reverse" />
             <span>RESET TWIN STATE</span>
           </button>
         </div>
@@ -112,7 +142,7 @@ export default function Layout({
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="text-[10px] text-slate-500 font-mono">
+            <div className="text-[10px] text-slate-550 text-slate-500 font-mono">
               DEMO CASE: <span className="text-slate-300 font-bold">PLANT ALPHA CNC CRITICALITY</span>
             </div>
           </div>

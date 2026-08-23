@@ -56,7 +56,7 @@ export default function CommandCenter({
           {isM17Failed && !isOptimized && (
             <button
               onClick={onOptimize}
-              className="px-4 py-2 bg-alarm-purple hover:bg-purple-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(168,85,247,0.3)] transition-all duration-200"
+              className="px-4 py-2 bg-alarm-purple hover:bg-purple-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.3)] transition-all duration-200"
             >
               <Zap className="w-3.5 h-3.5" />
               RUN OPTIMIZER
@@ -181,15 +181,15 @@ export default function CommandCenter({
 
                 <div className="grid grid-cols-3 gap-2 border-t border-industrial-800 pt-4 mt-2 text-center font-mono">
                   <div>
-                    <span className="text-[9px] text-slate-550 block uppercase text-slate-500">Cascade Risk After</span>
+                    <span className="text-[9px] text-slate-500 block uppercase">Cascade Risk After</span>
                     <span className="text-sm font-bold text-alarm-green mt-0.5 block">84% &rarr; 18%</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-550 block uppercase text-slate-500">Production Preserved</span>
-                    <span className="text-sm font-bold text-slate-250 mt-0.5 block">91%</span>
+                    <span className="text-[9px] text-slate-500 block uppercase">Production Preserved</span>
+                    <span className="text-sm font-bold text-slate-255 mt-0.5 block">91%</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-550 block uppercase text-slate-500">Estimated Loss Saved</span>
+                    <span className="text-[9px] text-slate-500 block uppercase">Estimated Loss Saved</span>
                     <span className="text-sm font-bold text-alarm-green mt-0.5 block">₹11.7 Lakh</span>
                   </div>
                 </div>
@@ -232,19 +232,44 @@ export default function CommandCenter({
                   <span className="font-bold text-slate-200">M17 CNC failure</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Machine loses bearing lubrication, overheating under heavy load.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+                
+                {/* Animating Conveyor Belt - Stopped (Fault state) */}
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-red/35" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt-stopped" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" />
+                  </svg>
+                </div>
                 
                 <div className="bg-slate-950/60 p-3.5 border border-industrial-800 rounded-md">
                   <span className="font-bold text-slate-200">Line 3 Degradation</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Precision Line 3 throughput drops to 0%, starving adjacent assemblies.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-red/35" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt-stopped" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" />
+                  </svg>
+                </div>
                 
                 <div className="bg-slate-950/60 p-3.5 border border-industrial-800 rounded-md">
                   <span className="font-bold text-slate-200">M19 Thermal Overload</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Adjacent Laser Cutter pulls excessive power and ambient heat rises.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-red/35" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt-stopped" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" />
+                  </svg>
+                </div>
 
                 <div className="bg-slate-950/60 p-3.5 border border-alarm-red/10 bg-red-950/5 rounded-md">
                   <span className="font-bold text-alarm-red">Batch Delay & STOCKOUT</span>
@@ -262,19 +287,44 @@ export default function CommandCenter({
                   <span className="font-bold text-slate-200">Abnormal telemetry detected</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">M17 bearing heat trend prompts failure likelihood of 92%.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+
+                {/* Animating Conveyor Belt - Flowing Green (Operational state) */}
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-green/60" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt text-alarm-green/80" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                  </svg>
+                </div>
                 
                 <div className="bg-slate-950/60 p-3.5 border border-industrial-800 rounded-md">
                   <span className="font-bold text-slate-200">M19 Load Reduced by 20%</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Slowing M19 preserves its bearings and limits thermal emission in Zone 3.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-green/60" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt text-alarm-green/80" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                  </svg>
+                </div>
                 
                 <div className="bg-slate-950/60 p-3.5 border border-industrial-800 rounded-md">
                   <span className="font-bold text-slate-200">Batch #482 shifted to Line 2</span>
                   <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Precision assembly resumes on Line 2 with 15 mins setup delay.</p>
                 </div>
-                <div className="flex justify-center text-slate-650"><ArrowRight className="w-4 h-4 rotate-90" /></div>
+
+                <div className="flex justify-center items-center py-1">
+                  <svg className="w-24 h-5 text-alarm-green/60" viewBox="0 0 100 20" fill="none">
+                    <line x1="5" y1="10" x2="95" y2="10" stroke="currentColor" strokeWidth="3" className="conveyor-belt text-alarm-green/80" />
+                    <circle cx="20" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="50" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                    <circle cx="80" cy="10" r="3.5" fill="currentColor" className="animate-pulse" />
+                  </svg>
+                </div>
                 
                 <div className="bg-slate-950/60 p-3.5 border border-alarm-green/10 bg-emerald-950/5 rounded-md">
                   <span className="font-bold text-alarm-green">Root cause repaired & contained</span>
@@ -333,10 +383,17 @@ export default function CommandCenter({
                 </div>
               </div>
 
+              {/* Power Oscilloscope Segment */}
               <div className="p-3 border border-industrial-800/80 bg-slate-950/40 rounded-md flex items-start gap-2.5">
                 <ShieldCheck className="w-4.5 h-4.5 text-alarm-green shrink-0 mt-0.5" />
-                <div className="text-[10px] leading-relaxed text-slate-400">
-                  <strong className="text-slate-350 block">UTILITY FEED: STABLE</strong>
+                <div className="text-[10px] leading-relaxed text-slate-400 w-full">
+                  <div className="flex justify-between items-center mb-1">
+                    <strong className="text-slate-350">UTILITY FEED: STABLE</strong>
+                    {/* Live Oscilloscope Waveform */}
+                    <svg className="w-16 h-3 text-alarm-green" viewBox="0 0 100 20" fill="none">
+                      <path d="M0,10 Q12.5,0 25,10 T50,10 T75,10 T100,10" stroke="currentColor" strokeWidth="2" className="oscilloscope-wave" />
+                    </svg>
+                  </div>
                   Power grid load: 587kW (73.4% capacity). Compressed air pressure: 7.2 bar.
                 </div>
               </div>
@@ -382,7 +439,7 @@ export default function CommandCenter({
             </span>
             <span>🖥️ ARGUS SYSTEM SYSLOG FEED (ACTIVE STREAM)</span>
           </div>
-          <span className="text-[9px] text-slate-550 text-slate-500">SYSTEM TIME: LIVE</span>
+          <span className="text-[9px] text-slate-500">SYSTEM TIME: LIVE</span>
         </h3>
         
         <div className="bg-industrial-950/80 border border-industrial-850 p-4 rounded-md flex flex-col gap-1.5 text-[10px] text-slate-400 overflow-y-auto max-h-[140px] leading-relaxed shadow-[inset_0_1.5px_4px_rgba(0,0,0,0.5)]">

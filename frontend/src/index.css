@@ -1,44 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-industrial-950: #07080a;
-  --color-industrial-900: #0e1014;
-  --color-industrial-850: #161920;
-  --color-industrial-800: #161920;
-  --color-industrial-750: #212530;
-  --color-industrial-700: #212530;
-  --color-industrial-600: #2c3240;
-  --color-industrial-500: #434b5c;
-  --color-industrial-400: #647087;
-  --color-industrial-300: #94a1b8;
-  --color-industrial-100: #e2e8f0;
+  --color-industrial-950: #050608;
+  --color-industrial-900: #0a0c10;
+  --color-industrial-850: #121620;
+  --color-industrial-800: #1a1f2c;
+  --color-industrial-750: #22293a;
+  --color-industrial-700: #2d374e;
+  --color-industrial-600: #384562;
+  --color-industrial-500: #4e6088;
+  --color-industrial-400: #7187b3;
+  --color-industrial-300: #9ab4e3;
+  --color-industrial-100: #f1f5f9;
 
-  --color-alarm-red: #ef4444;
+  --color-alarm-red: #f43f5e;
   --color-alarm-amber: #f59e0b;
   --color-alarm-green: #10b981;
-  --color-alarm-purple: #8b5cf6;
+  --color-alarm-purple: #a855f7;
   --color-alarm-blue: #3b82f6;
 
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', 'monospace';
 }
 
 .react-flow__renderer {
-  background-color: #07080a;
+  background-color: #050608;
+  background-image: radial-gradient(circle at 50% 50%, #121620 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .react-flow__node {
-  border-radius: 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .react-flow__handle {
-  width: 8px !important;
-  height: 8px !important;
-  background: #434b5c !important;
-  border: 1px solid #161920 !important;
+  width: 10px !important;
+  height: 10px !important;
+  background: #a855f7 !important;
+  border: 2px solid #0a0c10 !important;
 }
 
 .react-flow__edge-path {
-  stroke-width: 2px;
+  stroke-width: 2.5px;
 }
 
 /* Pulsing edge animation for active simulations */
@@ -53,22 +57,39 @@
 
 .edge-pulsing {
   stroke-dasharray: 6;
-  animation: flowPulse 1s linear infinite;
-  stroke: #8b5cf6 !important; /* purple pulse for simulation */
+  animation: flowPulse 1.2s linear infinite;
+  stroke: #a855f7 !important; /* purple pulse for simulation */
+  filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.4));
 }
 
 .edge-failed {
   stroke-dasharray: 4;
-  animation: flowPulse 1.5s linear infinite;
-  stroke: #ef4444 !important; /* red pulse for failure path */
+  animation: flowPulse 1.8s linear infinite;
+  stroke: #f43f5e !important; /* red pulse for failure path */
+  filter: drop-shadow(0 0 4px rgba(244, 63, 94, 0.4));
 }
 
 body {
   margin: 0;
-  background-color: #07080a;
-  color: #e2e8f0;
+  background-color: #050608;
+  color: #f1f5f9;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+}
+
+/* Modern Glass Panels */
+.glass-panel {
+  background: rgba(10, 12, 16, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.05);
 }
 
 /* Custom scrollbars */
@@ -77,12 +98,69 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0e1014;
+  background: #050608;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2c3240;
-  border-radius: 3px;
+  background: #1a1f2c;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #434b5c;
+  background: #2d374e;
+}
+
+/* Gear Cluster Spinning Keyframes */
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 14s linear infinite;
+}
+
+.animate-spin-fast {
+  animation: spin-slow 6s linear infinite;
+}
+
+/* Conveyor Flow dash offsets */
+@keyframes conveyorMove {
+  from {
+    stroke-dashoffset: 20;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.conveyor-belt {
+  stroke-dasharray: 5, 5;
+  animation: conveyorMove 1s linear infinite;
+}
+
+.conveyor-belt-fast {
+  stroke-dasharray: 4, 4;
+  animation: conveyorMove 0.4s linear infinite;
+}
+
+.conveyor-belt-stopped {
+  stroke-dasharray: 5, 5;
+}
+
+/* Oscilloscope Line Animation */
+@keyframes gridScan {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.oscilloscope-wave {
+  animation: gridScan 4s linear infinite;
 }
