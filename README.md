@@ -1,15 +1,14 @@
 # ARGUS — AI Digital Twin & Industrial World Model for Preventing Cascade Failures
 
-### Tagline
-**Predict the Cascade. Simulate the Future. Prevent the Failure.**
+ARGUS is a Model-Based Decision Intelligence and Industrial Resilience Platform. It moves beyond predicting failures to simulating and preventing their system-wide consequences. 
 
 ---
 
-## 1. THE DETAILED PROBLEM STATEMENT
+## 1. DETAILED PROBLEM STATEMENT & THE COGNITIVE GAP IN INDUSTRY
 
-In modern manufacturing plants and automated assembly lines, machines do not operate in isolation. They form a tightly coupled, interconnected network of physical processes, utilities, and logistics. 
+In modern manufacturing plants, automated assembly lines, and critical infrastructure, machinery does not operate in isolation. Rather, it forms a tightly coupled, highly interdependent network of physical processes, utility loops, and supply chain logistics. 
 
-Traditional industrial monitoring platforms rely on **Predictive Maintenance (PdM)**. PdM asks a simple, localized question: *“Is Machine 17 likelihood to fail?”* It treats machines as isolated components, monitoring temperature and vibration, and triggers an alert when a threshold is breached.
+Traditional industrial monitoring platforms rely on **Predictive Maintenance (PdM)**. PdM asks a simple, localized question: *"Is Machine 17 likely to fail?"* It treats machines as isolated components, monitoring sensor values like temperature and vibration, and triggers an alert when a threshold is breached.
 
 However, in practice, localized failures are rarely isolated. They trigger cascading chain reactions throughout the facility:
 1. **Physical Redundancy Overloads**: If a CNC machine (M17) fails, the production line capacity drops, shifting the workload onto adjacent machines (such as the Laser Cutter M19).
@@ -17,16 +16,14 @@ However, in practice, localized failures are rarely isolated. They trigger casca
 3. **Utility Collapse**: Stressed cooling zones exceed their capacity, causing ambient temperatures in the production zone to rise, which degrades the health of nearby healthy machinery (Stamping and Milling units).
 4. **Logistics & Financial Penalties**: Downstream assembly lines are starved of parts, causing delays in contract batches (Batch #482). This triggers warehouse stockouts and active contract delivery penalties.
 
-### The Problem Gap
+### The Cognitive Gap
 Traditional PdM systems cannot forecast downstream propagation routes or determine the systemic criticality of an asset. An operator receives an alert that M17 has failed, but they have no tool to predict the cascade trajectory or search the combinatorial space of interventions (such as load-throttling, line-shifting, and utility reallocations) to find the most cost-efficient and safe response in real time.
 
 ---
 
 ## 2. THE PROPOSED SOLUTION: ARGUS
 
-**ARGUS** is a Model-Based Decision Intelligence and Industrial Resilience Platform. It moves beyond predicting failures to simulating and preventing their system-wide consequences. 
-
-ARGUS integrates telemetry forecasting, explainable machine learning, graph network topology, a hybrid World Model simulation, and model-based reinforcement learning (RL) to assist operators in containing cascading disruptions before they lead to factory-wide shutdowns.
+ARGUS implements a model-based decision architecture that closes the loop between predictive sensing and preventive action. It integrates telemetry forecasting, explainable machine learning, graph network topology, a hybrid World Model simulation, and model-based reinforcement learning (RL) to assist operators in containing cascading disruptions before they lead to factory-wide shutdowns.
 
 ```
  [ SENSE ]   ──►  Continuous Telemetry Feed (Temperature, Vibration, Load)
@@ -46,87 +43,91 @@ ARGUS integrates telemetry forecasting, explainable machine learning, graph netw
 
 ---
 
-## 3. COMPONENT DEEP DIVE: MODELS, ALGORITHMS & EQUATIONS
+## 3. TECHNICAL DEEP DIVE: MODELLING, ALGORITHMS & MATHEMATICAL FORMULATIONS
 
-### A. Synthetic Telemetry Generator
-* **File Location**: [`train_failure_prediction.py`](file:///d:/Argus-Ai/backend/app/ml/train_failure_prediction.py)
-* **Design**: Generates **55,000+ telemetry records** representing physical relationships to avoid trivial random data.
+### A. Synthetic Telemetry Data Engineering
+* **File Location**: `backend/app/ml/train_failure_prediction.py`
+* **Dataset Scale**: Generates **55,000+ telemetry records** modeling physical variables to avoid trivial random data.
+* **Telemetry Variables**:
+  1. `temperature`: Core bearing operating temperature in degrees Celsius (°C).
+  2. `temperatureTrend`: Rate of change of temperature over time (°C/min).
+  3. `vibration`: Housing vibration velocity amplitude in millimeters per second (mm/s).
+  4. `vibrationTrend`: Rate of change of vibration amplitude over time (mm/s/min).
+  5. `powerConsumption`: Electrical power drawn by the motor drive in kilowatts (kW).
+  6. `powerTrend`: Rate of change of electrical power draw over time (kW/min).
+  7. `utilization`: Active mechanical load percentage (0% to 100%).
+  8. `rpm`: Rotational speed of the drive shaft (RPM).
+  9. `maintenanceAge`: Time elapsed since the last overhaul (hours).
 * **Correlation Logic**:
-  * **Temperature**: Simulates operating heat using:
-    \(T = 28.0 + (U \cdot 0.48) + (M_{\text{age}} \cdot 0.025) + \mathcal{N}(0, 3.5)\)
-    where \(U\) is active utilization (%), \(M_{\text{age}}\) is maintenance age (hours), and \(\mathcal{N}\) represents normal sensor noise.
-  * **Vibration**: Simulates vibration signals based on physical component wear:
-    \(V = 0.8 + (U / 22.0) + (M_{\text{age}} / 90.0) \cdot 0.9 + \mathcal{N}(0, 0.5)\)
-  * **Power Consumption**: Simulates load-drawn electricity:
-    \(P = 20.0 + U \cdot 0.85 + \max(0, V - 1.0) \cdot 2.5 + \mathcal{N}(0, 2.5)\)
+  * **Temperature**: Operating heat is simulated based on active load and component wear:
+    * *Temperature = Base 28.0 + (Utilization * 0.48) + (Maintenance Age * 0.025) + Sensor Noise*
+  * **Vibration**: Vibration signals are simulated based on component wear:
+    * *Vibration = Base 0.8 + (Utilization / 22.0) + (Maintenance Age / 90.0) * 0.9 + Sensor Noise*
+  * **Power Consumption**: Electricity drawn is simulated based on active load:
+    * *Power = Base 20.0 + (Utilization * 0.85) + Excess Vibration Penalty * 2.5 + Sensor Noise*
 
 ---
 
 ### B. Machine Failure Prediction Model (XGBoost)
-* **File Location**: [`train_failure_prediction.py`](file:///d:/Argus-Ai/backend/app/ml/train_failure_prediction.py)
-* **Algorithm**: **XGBClassifier** (eXtreme Gradient Boosting Classifier) chosen for its high accuracy on structured tabular sensor datasets.
+* **File Location**: `backend/app/ml/train_failure_prediction.py`
+* **Algorithm Concept**: **XGBoost Classifier** (eXtreme Gradient Boosting Classifier).
+* **How it works**: XGBoost is a supervised learning algorithm that implements gradient boosted decision trees. It trains a sequence of weak decision tree estimators. Each tree is trained to predict the residuals (errors) of the preceding trees, optimizing a binary classification loss function (Logarithmic Loss) via gradient descent. This allows the model to capture highly complex, non-linear interactions between temperature trends, vibration spikes, and deferred maintenance age.
 * **Hyperparameters**:
-  * `n_estimators`: 120
-  * `max_depth`: 5 (prevents overfitting to sensor noise)
-  * `learning_rate`: 0.08
-  * `eval_metric`: `logloss`
+  * Number of Estimators: 120
+  * Maximum Tree Depth: 5 (limits tree complexity to prevent overfitting to sensor noise)
+  * Learning Rate: 0.08 (step-size shrinkage to prevent optimization divergence)
+  * Evaluation Loss Function: Binary Logarithmic Loss (LogLoss)
 * **Input Features**: `[temperature, temperatureTrend, vibration, vibrationTrend, powerConsumption, powerTrend, utilization, rpm, maintenanceAge]`
 * **Outputs**: Probability of a bearing lockup or component failure within the next 3 hours.
 * **Model Evaluation Metrics (Test Set Split)**:
   * **Precision**: 94.2% (minimizes false alarms)
   * **Recall**: 91.5% (ensures critical failures are caught)
-  * **F1-Score**: 92.8% (balanced harmonic mean)
+  * **F1-Score**: 92.8% (balanced harmonic mean of precision and recall)
   * **ROC-AUC**: 0.982 (indicates outstanding classifier separability)
 
 ---
 
 ### C. Explainable AI (SHAP)
-* **File Location**: [`ml_engine.py`](file:///d:/Argus-Ai/backend/app/ml_engine.py)
-* **Algorithm**: **SHAP (SHapley Additive exPlanations)** based on cooperative game theory.
-* **Mathematical Equation**: Calculates the Shapley value \(\phi_i\) for feature \(i\):
-  \[\phi_i(x) = \sum_{S \subseteq F \setminus \{i\}} \frac{|S|!(|F| - |S| - 1)!}{|F|!} \left[ f_x(S \cup \{i\}) - f_x(S) \right]\]
-  where \(F\) is the set of all features, \(S\) is a subset of features excluding \(i\), and \(f_x(S)\) is the conditional expectation of the model output given the features in \(S\).
-* **Usage**: Generates local feature attribution charts for any clicked machine in the Digital Twin, showing exactly which sensor signal (e.g. vibration spikes vs cooling loads) is driving the failure risk.
+* **File Location**: `backend/app/ml_engine.py`
+* **Algorithm Concept**: **SHAP (SHapley Additive exPlanations)**.
+* **How it works**: SHAP is a game-theoretic approach to explaining the output of machine learning models. For a given machine, SHAP compares the failure prediction output across all possible feature subsets. It isolates the exact marginal contribution of each telemetry input.
+* **Explanation Math**: For each feature, the attribution weight is computed by taking the weighted average of the difference in prediction when the feature is included versus when it is excluded, across all possible feature combinations.
+* **Usage**: Displays feature attribution bars for any clicked machine in the Digital Twin, showing exactly which sensor signal (e.g. vibration spikes vs temperature wear) is driving the failure risk.
 
 ---
 
 ### D. Graph AI & Network Topology
-* **File Location**: [`graph_engine.py`](file:///d:/Argus-Ai/backend/app/graph_engine.py)
-* **Algorithm**: Constructs a directed dependency graph \(G = (V, E)\) representing the physical factory layout.
+* **File Location**: `backend/app/graph_engine.py`
+* **Algorithm**: Constructs a directed dependency graph representing the physical factory layout.
 * **Topology Metrics**:
-  * **PageRank (Structural Importance)**: Measures the systemic influence of a node based on link connectivity:
-    \(PR(u) = \frac{1-d}{N} + d \sum_{v \in B_u} \frac{PR(v)}{L(v)}\)
-    where \(d = 0.85\) is the damping factor, and \(B_u\) is the set of nodes pointing to \(u\).
-  * **Betweenness Centrality (Flow Bottlenecks)**: Computes how often a node sits on shortest flow paths between other nodes:
-    \(g(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}}\)
-* **Systemic Criticality**: Normalized scoring combining centrality and downstream node dependency depth. This identifies "fragile single points of failure" that have low failure probabilities but catastrophic downstream reach.
+  * **PageRank**: Measures the structural importance of a node based on link connectivity. It models a flow probability across the network to identify nodes that are central to the facility.
+  * **Betweenness Centrality**: Computes how often a node sits on shortest flow paths between other nodes, identifying process bottlenecks.
+* **Systemic Criticality**: A combined score of topological centrality and downstream node dependency depth. This identifies "fragile single points of failure" that have low failure probabilities but catastrophic downstream reach.
 
 ---
 
 ### E. Hybrid learned World Model
-* **File Location**: [`world_model.py`](file:///d:/Argus-Ai/backend/app/world_model.py)
-* **Design**: Simulates the state trajectory \(S_{t+1} = f(S_t, a_t)\) using a hybrid approach combining physical equations (conservation of energy, thermal loads) and machine learning estimates.
+* **File Location**: `backend/app/world_model.py`
+* **Design**: Simulates the state trajectory over a 180-minute horizon using a hybrid approach combining physical equations (conservation of energy, thermal loads) and machine learning estimates.
 * **Operational Rules**:
-  * **Thermal Load in Cooling Zones**:
-    \(L_{\text{zone}} = \sum_{m \in \text{Zone}} P_m \cdot \eta_{\text{thermal}} + L_{\text{ambient}}\)
-  * **Machine Degradation rate**:
-    \(H_{t+1} = H_t - (T_t / 100.0) \cdot 0.15 - (V_t / 10.0) \cdot 0.22\) (health score deterioration)
+  * **Thermal Load in Cooling Zones**: Sum of power consumption from active machines in the zone multiplied by thermal efficiency, added to ambient temperature loads.
+  * **Machine Degradation Rate**: Machine health degrades faster when operating at high temperatures and extreme vibration.
 * **Validation Metrics**:
-  * **MAE (Mean Absolute Error)**: 1.18°C
-  * **RMSE**: 1.54°C
-  * **R² (Coefficient of Determination)**: 0.984 (recovers 98.4% of actual temperature variance)
+  * **Mean Absolute Error (MAE)**: 1.18°C
+  * **Root Mean Squared Error (RMSE)**: 1.54°C
+  * **R-squared (R2)**: 0.984 (recovers 98.4% of temperature variance)
 
 ---
 
 ### F. Model-Based Reinforcement Learning (PPO)
-* **File Locations**: [`gym_env.py`](file:///d:/Argus-Ai/backend/app/ml/gym_env.py) and [`train_rl.py`](file:///d:/Argus-Ai/backend/app/ml/train_rl.py)
-* **Environment**: Implements Gymnasium interface wrapping the World Model.
+* **File Locations**: `backend/app/ml/gym_env.py` and `backend/app/ml/train_rl.py`
+* **Environment**: Implements a Gymnasium interface wrapping the World Model.
 * **Observation Space** (49 Dimensions):
-  * 8 Machines \(\times\) 5 features (health, risk, temp, vibration, load) = 40
-  * 3 assembly lines \(\times\) 1 feature (capacity) = 3
-  * 3 cooling zones \(\times\) 1 feature (utilization) = 3
-  * 1 power grid \(\times\) 1 feature (utilization) = 1
-  * 1 inventory \(\times\) 1 feature (level) = 1
+  * 8 Machines * 5 features (health, risk, temp, vibration, load) = 40
+  * 3 assembly lines * 1 feature (capacity) = 3
+  * 3 cooling zones * 1 feature (utilization) = 3
+  * 1 power grid * 1 feature (utilization) = 1
+  * 1 inventory * 1 feature (level) = 1
   * 1 time tracker = 1
 * **Action Space** (6 Discrete Actions):
   * `0`: Do Nothing
@@ -135,9 +136,9 @@ ARGUS integrates telemetry forecasting, explainable machine learning, graph netw
   * `3`: Shift Batch #482 to Line 2
   * `4`: Boost Cooling Zone 3 (Auxiliary reallocation)
   * `5`: Throttle M17 Load by 15%
-* **Multi-Objective Reward Function**:
-  \[\text{Reward} = - \left( \frac{\Delta \text{Loss}}{10000} \right) - \left( \frac{\Delta \text{Cost}}{20000} \right) - \text{SafetyPenalties} + 1.5 \cdot \Delta \text{Resilience} + \text{StatusBonus}\]
-* **Algorithm**: **PPO** (Proximal Policy Optimization) using Stable-Baselines3, configured with an MLP policy.
+* **Reward Function**:
+  * *Reward = - (Step Financial Loss / 10000) - (Step Intervention Cost / 20000) - Safety Penalties + 1.5 * Change in Resilience + Status Bonus*
+* **Algorithm**: **PPO** (Proximal Policy Optimization) using Stable-Baselines3. PPO uses a clipped surrogate objective to prevent destabilizing policy updates during gradient steps.
 * **Training Results (100k Steps)**:
   * Mean episode reward stabilized at **+66.4**.
   * Total policy/value loss dropped to **0.656** with an explained variance of **99.1%**.
@@ -145,81 +146,127 @@ ARGUS integrates telemetry forecasting, explainable machine learning, graph netw
 ---
 
 ### G. Multi-Objective Decision Optimizer
-* **File Location**: [`optimizer.py`](file:///d:/Argus-Ai/backend/app/optimizer.py)
-* **Design**: Explores combination sets of candidate actions. Evaluates feasibility checks (verifying that reallocating cooling doesn't starve other zones), rejects strategies that breach safety bounds, and scores them using weighted objectives:
-  \[\text{Fitness} = w_{\text{risk}} \cdot R_{\text{reduction}} + w_{\text{prod}} \cdot P_{\text{preserved}} - w_{\text{cost}} \cdot C_{\text{intervention}}\]
+* **File Location**: `backend/app/optimizer.py`
+* **Design**: Explores combination sets of candidate actions. Evaluates feasibility checks (verifying that reallocating cooling doesn't starve other zones), rejects strategies that breach safety bounds, and scores them using weighted objectives across risk reduction, production preserved, and intervention cost.
 
 ---
 
-## 4. SYSTEM ARCHITECTURE & REPOSITORY LAYOUT
+## 4. IMPACTFUL INDUSTRIAL APPLICATIONS
 
-```text
-ARGUS/
-│
-├── .gitignore              # Configured Git exclusions
-├── requirements.txt        # Python dependency stack
-├── .env.example            # Environment configurations
-├── README.md               # Extensive project README (this file)
-│
-├── backend/
-│   ├── app/
-│   │   ├── main.py                # FastAPI HTTP routing & startup loaders
-│   │   ├── models.py              # Pydantic state space schemas
-│   │   ├── graph_engine.py        # Dependency graph NetworkX centralities
-│   │   ├── world_model.py         # State transition rules & rollouts
-│   │   ├── cascade_engine.py      # Downstream temporal failure simulation
-│   │   ├── ml_engine.py           # Classifier loader & local SHAP explainer
-│   │   ├── optimizer.py           # Constraint solver & objective normalizations
-│   │   ├── natural_language.py    # English query NLP rule parser
-│   │   │
-│   │   ├── ml/
-│   │   │   ├── train_failure_prediction.py  # XGBoost dataset & classifier trainer
-│   │   │   ├── gym_env.py                  # Gymnasium environment wrapper
-│   │   │   ├── train_rl.py                  # Stable-Baselines3 PPO training
-│   │   │   └── evaluate_rl.py               # Evaluates PPO vs Baselines
-│   │   │
-│   │   └── data/                  # Persisted serialized model artifacts
-│   │       ├── failure_model.pkl
-│   │       ├── failure_metrics.json
-│   │       ├── argus_ppo_policy.zip
-│   │       ├── rl_training_metrics.json
-│   │       └── policy_comparison.json
-│   │
-│   └── tests/
-│       └── test_backend.py        # Pytest automated test suite
-│
-└── frontend/
-    ├── package.json
-    ├── tailwind.config.js
-    ├── postcss.config.js          # Tailwind v4 configuration
-    ├── index.html
-    │
-    ├── src/
-    │   ├── main.tsx
-    │   ├── App.tsx                # App state, layout router & chat triggers
-    │   ├── types/
-    │   │   └── index.ts           # Shared TypeScript interfaces
-    │   ├── services/
-    │   │   └── api.ts             # Axios HTTP endpoints bindings
-    │   ├── components/
-    │   │   ├── Layout.tsx         # Sidebar navigation & status headers
-    │   │   └── DigitalTwin/
-    │   │       └── GraphView.tsx  # React Flow interactive network map
-    │   └── pages/
-    │       ├── CommandCenter.tsx  # KPI indicators & syslog log terminal
-    │       ├── DigitalTwin.tsx    # Inspector panel & Time Machine scrubber
-    │       ├── LiveTelemetry.tsx  # Real-time sensors & degradation trigger
-    │       ├── CascadeLab.tsx     # Failure target inputs & timeline outputs
-    │       ├── WorldModel.tsx     # Recharts branching trajectory plot
-    │       ├── InterventionLab.tsx# Objective weight sliders & strategies table
-    │       ├── Resilience.tsx     # Vulnerability map & investment budget planner
-    │       ├── IncidentReplay.tsx # media-style player control panels
-    │       └── ModelIntelligence.tsx # XGBoost, World Model, & PPO reward curves
-```
+ARGUS's model-based decision architecture applies to a wide range of capital-intensive industries where single-point failures propagate into systemic disruptions:
+
+### 1. Semiconductor Fabrication Plants (Fabs)
+* **The Problem**: Semiconductor manufacturing involves highly sensitive chemical, thermal, and optical processes. If a lithography stepper unit experiences optical wear or vibration anomalies, continuing production yields defective wafers. However, shutting down the stepper halts the production queue, causing wafer backlogs, thermal stress in deposition chambers, and cleanroom HVAC imbalances.
+* **ARGUS Impact**: 
+  * Identifies the systemic criticality of steppers, tracks wafer throughput loads, and simulates cascade impacts on downstream etching and polishing units.
+  * Recommends optimal load-balancing and wafer inventory routing to prevent tool starvation while maintaining cleanroom thermal equilibria.
+
+### 2. Automotive Assembly Plants
+* **The Problem**: Automotive manufacturing depends on continuous, synchronous assembly lines. A failure in a robotic welding cell on a stamping line stops the conveyor, starving the painting booth and final trim assembly. Painting booths require continuous thermal and humidity controls; halting wafer conveyors causes paint to cure incorrectly, leading to rework costs.
+* **ARGUS Impact**:
+  * Simulates propagation timelines when a welding robot exhibits motor current anomalies.
+  * Dynamically schedules batch shifts to parallel assembly paths and optimizes cooling zone allocations to protect paint booth curing zones.
+
+### 3. Petrochemical Refineries & Chemical Plants
+* **The Problem**: Chemical processing operates in continuous fluid and thermal networks. A pressure drop or pump degradation in a distillation column feeds unstable mixtures downstream, raising temperatures in cracking chambers and overloading safety flare systems.
+* **ARGUS Impact**:
+  * Models pipe connections and utility links (cooling water, steam pressure) as a directed dependency graph.
+  * Recommends optimal throttling interventions and reflux pump reallocations to safely contain thermal runaways.
+
+### 4. Smart Electrical Power Grids
+* **The Problem**: High-voltage electrical distribution networks are highly susceptible to cascading overloads. If a substation transformer fails due to insulation wear, the load automatically shifts to adjacent lines, causing them to overheat, trip, and trigger regional blackouts.
+* **ARGUS Impact**:
+  * Tracks transformer temperature trends and predicts failure risks.
+  * Uses PPO reinforcement learning to evaluate line load-balancing actions and cooling loop boosts, preventing cascading line trips.
+
+### 5. Fulfillment Warehouses & Supply Chain Logistics
+* **The Problem**: Automated fulfillment centers rely on high-speed conveyor sorting systems. If a primary sorting conveyor experiences drive shaft failure, it starves packaging stations, degrades shipping volumes, and triggers late-delivery contract penalties with logistics partners.
+* **ARGUS Impact**:
+  * Models sorting stations and shipping lanes.
+  * Recommends conveyor speed adjustments and shifts order batches to parallel sorting loops to maintain fulfillment rates.
+
+### 6. Discrete & Heavy Manufacturing (CNC, Forging, Casting)
+* **The Problem**: Heavy forging presses and precision CNC metal-cutting lines operate under severe mechanical loads. If a hydraulic seal on a forging press starts leaking, pressure declines. The line experiences immediate quality defects, and the mechanical wear shifts load stress to secondary casting furnaces, overloading electrical breakers and risking raw metal solidification in runners.
+* **ARGUS Impact**:
+  * Connects hydraulic pressure feeds and motor temperature vectors.
+  * Computes optimum thermal distribution to avoid metal solidification while scheduling immediate maintenance tasks.
+
+### 7. Pharmaceutical Batch Bioreactors & Synthesis
+* **The Problem**: Biopharmaceutical manufacturing relies on strict temperature and chemical controls within bioreactor chambers to synthesize vaccine and antibiotic batches. A chiller pump anomaly in a reactor cooling loop ruins the current cell culture. The raw active ingredient is spoiled, and downstream high-performance liquid chromatography (HPLC) filtration lines are starved, stalling the cleanroom packaging line.
+* **ARGUS Impact**:
+  * Moniters bioreactor cooling utilization and predicts temperature runaways.
+  * Reallocates auxilliary cooling loads and reschedules packaging batches to parallel sterile lines to prevent cleanroom downtime.
+
+### 8. Food, Beverage & Cold-Chain Processing
+* **The Problem**: Large-scale dairies and bakeries rely on continuous pasteurization heat-exchangers and high-speed bottling conveyors. If a steam valve regulator fails, milk pasteurization temperatures drop. Undercooked milk must be discarded, conveyor lines stall, and cold-storage refrigeration units experience load spikes to keep existing stock chilled.
+* **ARGUS Impact**:
+  * Evaluates steam and cooling utility limits.
+  * Computes conveyor velocity throttling actions to preserve product pasteurization times and prevent warehouse refrigeration overloads.
+
+### 9. Aerospace Manufacturing & Composite Curing
+* **The Problem**: Carbon-fiber aircraft fuselage and wing structures are cured inside large autoclaves under high pressure and temperature. If an autoclave seal begins leaking, pressure drops. If curing halts mid-cycle, the entire multi-million dollar wing assembly is scrapped. However, boosting autoclave pressure draws maximum electrical loads, risking sub-station line trips.
+* **ARGUS Impact**:
+  * Simulates electrical load limits across autoclave systems.
+  * Optimizes auxiliary power allocation and throttles non-critical factory systems (machining centers) to protect active composite curing cycles.
+
+### 10. Municipal Water Treatment & Distribution
+* **The Problem**: City water treatment plants pump water through intake filtration beds, chlorine dosing chambers, and distribution pipelines. If a high-voltage pump on an intake line fails, the water flow drops, lowering filtration bed levels. The dosing concentration spikes to toxic levels unless chemical injection rates are adjusted, and pressure drops down the distribution network, risking pipe collapse.
+* **ARGUS Impact**:
+  * Models flow connections, dosing rates, and pipe pressures.
+  * Recommends immediate dosing adjustments and valve routing actions to protect filters and maintain grid water pressure.
+
+### 11. Heavy Mining & Mineral Processing
+* **The Problem**: Mining mills crush rock using large rotary crushers and transport minerals via miles of conveyor belts. If a crusher bearing locks up, it halts the feed conveyor. Unprocessed ore piles up at conveyor transfers, overloading belt motors, and downstream flotation cells are starved of input, disrupting chemical recovery rates.
+* **ARGUS Impact**:
+  * Tracks crusher bearing heat trends and belt motor current vectors.
+  * Recommends belt velocity slowdowns and feeder gate adjustments to protect belts while scheduling crusher maintenance.
 
 ---
 
-## 5. INSTALLATION & SETUP
+## 5. FUTURE ROADMAP & ADVANCED RESEARCH DIRECTIONS
+
+To transition ARGUS from a simulation prototype to a next-generation enterprise resilience platform, we have designed the following high-impact future development paths:
+
+### 1. Multi-Agent Collaborative Swarms (Cross-Factory Federated Intelligence)
+* **Concept**: Scaling ARGUS to communicate across separate, geodistributed manufacturing plants. If Plant A suffers a critical part stockout cascade, its ARGUS agent automatically negotiates load-balancing, inventory sharing, and shipping re-routing schedules with the ARGUS agent at Plant B.
+* **System Impact**: Uses **federated learning** to negotiate supply chain allocations autonomously in real time without sharing proprietary or sensitive raw telemetry datasets between facilities.
+
+### 2. Generative World Model Video Rollouts (Sora-Style Factory Physics)
+* **Concept**: Integrating generative video diffusion models to synthesize actual thermal infrared video forecast rollouts of factory bays. 
+* **System Impact**: Instead of looking at charts, operators can watch an AI-generated video showing exactly how steam valves, pressure tanks, or motor bearings will start smoking and cracking at $T+45$ minutes, creating an intuitive visual inspection interface.
+
+### 3. Neuromorphic Edge Computing PLCs (Sub-Watt Real-Time Prevention)
+* **Concept**: Deploying the pre-trained PPO decision policy weights onto spiking neural networks (SNNs) directly inside neuromorphic PLC controller chips.
+* **System Impact**: Enables microsecond-level localized inference at the machine level using less than a watt of power. This allows active, autonomous cascade prevention directly at the sensor level, even during complete factory network blackouts.
+
+### 4. Spatio-Temporal Graph Attention GNNs (Latent Vulnerability Discovery)
+* **Concept**: Upgrading the directed graph NetworkX engine to an active Spatio-Temporal Graph Attention Network (STGAT). The GNN learns spatial proximity and temporal dependencies across millions of sensor signals.
+* **System Impact**: It automatically discovers previously unknown, latent physical coupling vulnerabilities in factory designs—such as a vibration harmonic in Line 1 slowly wearing out a weld joint in Line 2 due to physical floor conduction.
+
+### 5. AR/MR Spatial Twin Cockpit (Apple Vision Pro & Mixed Reality Floor overlay)
+* **Concept**: Bringing the Digital Twin into mixed reality. Operators wear AR headsets (like Apple Vision Pro) to walk the factory floor, where real-time SHAP risk bubbles, dependency arrows, and cascade warnings are overlaid directly onto physical machinery.
+* **System Impact**: Creates an immersive spatial cockpit where operators can wave their hands to run counterfactual simulations and confirm PPO-recomended repair schedules right in front of the active machine.
+
+### 6. Causal Machine Learning & Structural Causal Models (SCMs)
+* **Concept**: Moving from correlation-based SHAP explanations to true **Causal Discovery and Structural Causal Models (SCMs)** using Judea Pearl's do-calculus.
+* **System Impact**: This will allow the system to mathematically model counterfactual interventions with actual causal guarantees, allowing the RL agent to distinguish between statistical correlation and physical causation during rollout simulations.
+
+### 7. Utility-to-Machine Microgrid Resiliency (Power Quality Monitoring)
+* **Concept**: Integrating electrical power quality factors (voltage transients, sags, swells, and total harmonic distortion [THD]) directly into the ML failure prediction models.
+* **System Impact**: Enables predictive warning alerts for electrical substation breakdowns and cooling pump stress caused by grid-level phase imbalances and power factor penalties.
+
+### 8. Quantum-Accelerated Combinatorial Strategy Search
+* **Concept**: Adapting the multi-objective intervention optimization layer to run on Quantum Approximate Optimization Algorithms (QAOA) or Quantum Annealing hardware.
+* **System Impact**: Solves the combinatorial explosion of candidate strategies across millions of interconnected nodes in constant time, allowing enterprise-scale plant-wide optimization under volatile constraint environments.
+
+### 9. Self-Healing PLC Automation (OPC-UA Close-Loop Control)
+* **Concept**: Establishing a secure, closed-loop feedback protocol between the approved RL policy outputs and edge PLC controllers via industrial standard OPC-UA links.
+* **System Impact**: Enables automated re-tuning of controller loops (e.g., dynamically adjusting proportional-integral-derivative [PID] gains or conveyor motor speed controls) to run machines under optimized degraded states while keeping them inside safety bounds.
+
+
+---
+
+## 6. INSTALLATION & SETUP
 
 Ensure you have Python 3.10+ and Node.js v20+ installed.
 
@@ -242,7 +289,6 @@ Ensure you have Python 3.10+ and Node.js v20+ installed.
    ```bash
    python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
    ```
-   *(Note: The server will automatically load the pre-trained failure models and PPO policy files at startup. If they are missing, it will rebuild and train them automatically).*
 
 ### B. React Frontend Setup
 1. In a separate terminal, navigate to the frontend directory:
@@ -262,35 +308,3 @@ Ensure you have Python 3.10+ and Node.js v20+ installed.
    npm run dev
    ```
 5. Open the local address in your web browser (usually `http://localhost:5173`).
-
----
-
-## 6. HACKATHON LIVE DEMO SCRIPT (3 MINUTES)
-
-When presenting ARGUS to the judges, follow this step-by-step walkthrough:
-
-1. **Nominal State Audit (Command Center)**:
-   * Point out the plant KPIs: Health is nominal (91%), Cascade Risk is secure (18%), and Resilience is high (78/100).
-   * Review the **Syslog Terminal** at the bottom showing normal initializations.
-   * Point out **M17** on the warning dashboard—sensor values are slightly elevated, but the plant remains stable.
-2. **Early Prediction & Explainability (Digital Twin)**:
-   * Click **Digital Twin** tab, then select the **M17 (Line 3 CNC Precision Unit)** node.
-   * Explain the **ML SHAP explanation** display: The model predicts a 92% failure probability, highlighting that vibration trend and temperature wear are the primary contributing factors.
-3. **Simulate Cascading Failure (Cascade Lab)**:
-   * Click **Simulate M17 Failure** in the Command Center (or input severity in Cascade Lab).
-   * Watch the network map lines pulse orange and red as the failure propagates.
-   * Review the **Failure Propagation Timeline**:
-     * **T+0m**: M17 bearings lock up.
-     * **T+4m**: Line 3 throughput drops to 30%.
-     * **T+11m**: Laser Cutter M19 experiences overload spike (load rises past 110%).
-     * **T+17m**: Cooling Zone 3 utilization exceeds 85%.
-     * **T+34m**: Batch #482 production delayed.
-     * **T+144m**: Warehouse inventory drops below safety buffer, triggering a **₹18.4 Lakh** contract delay penalty.
-4. **World Model Branching Futures (World Model)**:
-   * Open the **World Model** tab. Explain that ARGUS has simulated branching futures (Future A: Unmitigated collapse vs Future B: Contained recovery). Show the dual-axis chart comparing predicted temperatures and losses.
-5. **PPO Intervention Search (Interventions)**:
-   * Open the **Interventions** tab. Let the PPO RL Agent choose the best policy.
-   * Point out the recommended strategy: **Repair M17 + Shift Batch #482 to Line 2 + Throttle M19 load by 20%**. Explain that PPO found this combination in under 1 millisecond.
-6. **Confirm & Prevent (Command Center)**:
-   * Click **Apply Containment Strategy** (Human-in-the-Loop Override).
-   * Observe the plant state recover: M17 is repaired, the batch is completed on Line 2, and the total financial loss is capped at only **₹49,000**, saving **₹17.9 Lakhs** in late delivery penalties.
