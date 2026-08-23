@@ -1,4 +1,5 @@
 import { ShieldCheck, ShieldAlert, Zap, AlertCircle, Play, ArrowRight, Check } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { FacilityState } from '../types';
 
 interface CommandCenterProps {
@@ -26,6 +27,27 @@ export default function CommandCenter({
   metrics
 }: CommandCenterProps) {
   
+  // Sparkline history arrays for visual metrics
+  const healthData = [
+    { v: 92 }, { v: 90 }, { v: 88 }, { v: 86 }, { v: 84 }, { v: metrics.facilityHealth }
+  ];
+  
+  const riskData = isM17Failed
+    ? [{ v: 12 }, { v: 18 }, { v: 24 }, { v: 48 }, { v: 72 }, { v: metrics.cascadeRisk }]
+    : [{ v: 8 }, { v: 10 }, { v: 12 }, { v: 15 }, { v: 16 }, { v: metrics.cascadeRisk }];
+
+  const lossData = isM17Failed && !isOptimized
+    ? [{ v: 0 }, { v: 2 }, { v: 5 }, { v: 11 }, { v: 15 }, { v: 18.4 }]
+    : [{ v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }];
+
+  const assetData = [
+    { v: 1 }, { v: 1 }, { v: 1 }, { v: 2 }, { v: metrics.criticalAssets }
+  ];
+
+  const resilienceData = isOptimized
+    ? [{ v: 78 }, { v: 72 }, { v: 45 }, { v: 55 }, { v: 70 }, { v: metrics.resilienceScore }]
+    : [{ v: 82 }, { v: 80 }, { v: 78 }, { v: 75 }, { v: 76 }, { v: metrics.resilienceScore }];
+
   return (
     <div className="flex flex-col gap-6 select-none animate-fadeIn">
       
@@ -41,7 +63,7 @@ export default function CommandCenter({
           {!isM17Failed ? (
             <button
               onClick={onSimulateM17}
-              className="px-4 py-2 bg-alarm-red hover:bg-rose-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(244,63,94,0.3)] transition-all duration-200"
+              className="px-4 py-2 bg-alarm-red hover:bg-rose-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(244,63,94,0.3)] transition-all duration-200 cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               SIMULATE M17 FAILURE
@@ -56,7 +78,7 @@ export default function CommandCenter({
           {isM17Failed && !isOptimized && (
             <button
               onClick={onOptimize}
-              className="px-4 py-2 bg-alarm-purple hover:bg-purple-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(16,185,129,0.3)] transition-all duration-200"
+              className="px-4 py-2 bg-alarm-purple hover:bg-purple-600 active:scale-95 text-slate-100 rounded-md text-xs font-bold font-mono tracking-widest flex items-center gap-2 shadow-[0_4px_14px_rgba(168,85,247,0.3)] transition-all duration-200 cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" />
               RUN OPTIMIZER
@@ -65,14 +87,14 @@ export default function CommandCenter({
         </div>
       </div>
 
-      {/* Top Metrics Cards Row */}
+      {/* Top Metrics Cards Row with Sparklines */}
       <div className="grid grid-cols-5 gap-4">
         
         {/* Facility Health Card */}
-        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 group relative">
+        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-700/25 to-transparent" />
           <span className="text-[10px] text-slate-500 font-mono font-bold block mb-1">FACILITY HEALTH</span>
-          <div className="flex justify-between items-baseline mt-1.5">
+          <div className="flex justify-between items-baseline mt-1.5 z-10 relative">
             <span className="text-2xl font-bold font-mono tracking-tight text-slate-100">{metrics.facilityHealth}%</span>
             <span className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold ${
               metrics.facilityHealth > 75 ? 'bg-alarm-green/10 text-alarm-green' : 'bg-alarm-red/10 text-alarm-red'
@@ -80,13 +102,27 @@ export default function CommandCenter({
               {metrics.facilityHealth > 75 ? 'NOMINAL' : 'DEGRADED'}
             </span>
           </div>
+          {/* Sparkline */}
+          <div className="h-10 w-full mt-3 opacity-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={healthData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="healthS" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={metrics.facilityHealth > 75 ? '#10b981' : '#e11d48'} stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor={metrics.facilityHealth > 75 ? '#10b981' : '#e11d48'} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke={metrics.facilityHealth > 75 ? '#059669' : '#e11d48'} strokeWidth={1.5} fillOpacity={1} fill="url(#healthS)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Cascade Risk Card */}
-        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 group relative">
+        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-700/25 to-transparent" />
           <span className="text-[10px] text-slate-500 font-mono font-bold block mb-1">CASCADE RISK</span>
-          <div className="flex justify-between items-baseline mt-1.5">
+          <div className="flex justify-between items-baseline mt-1.5 z-10 relative">
             <span className="text-2xl font-bold font-mono tracking-tight text-slate-100">{metrics.cascadeRisk}%</span>
             <span className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold ${
               metrics.cascadeRisk > 40 ? 'bg-alarm-red/10 text-alarm-red animate-pulse' : 'bg-alarm-green/10 text-alarm-green'
@@ -94,35 +130,91 @@ export default function CommandCenter({
               {metrics.cascadeRisk > 40 ? 'CRITICAL' : 'SECURE'}
             </span>
           </div>
+          {/* Sparkline */}
+          <div className="h-10 w-full mt-3 opacity-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={riskData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="riskS" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={metrics.cascadeRisk > 40 ? '#e11d48' : '#10b981'} stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor={metrics.cascadeRisk > 40 ? '#e11d48' : '#10b981'} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke={metrics.cascadeRisk > 40 ? '#e11d48' : '#059669'} strokeWidth={1.5} fillOpacity={1} fill="url(#riskS)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Production At Risk Card */}
-        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 group relative">
+        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-700/25 to-transparent" />
           <span className="text-[10px] text-slate-500 font-mono font-bold block mb-1">PRODUCTION AT RISK</span>
-          <div className="flex justify-between items-baseline mt-1.5">
+          <div className="flex justify-between items-baseline mt-1.5 z-10 relative">
             <span className="text-2xl font-bold font-mono tracking-tight text-alarm-red">₹{round(metrics.productionAtRisk / 100000, 1)}L</span>
             <span className="text-[9px] font-mono text-slate-500 uppercase font-semibold">SIMULATED</span>
+          </div>
+          {/* Sparkline */}
+          <div className="h-10 w-full mt-3 opacity-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={lossData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="lossS" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#e11d48" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#e11d48" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke="#e11d48" strokeWidth={1.5} fillOpacity={1} fill="url(#lossS)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Critical Assets Card */}
-        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 group relative">
+        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-700/25 to-transparent" />
           <span className="text-[10px] text-slate-500 font-mono font-bold block mb-1">CRITICAL ASSETS</span>
-          <div className="flex justify-between items-baseline mt-1.5">
+          <div className="flex justify-between items-baseline mt-1.5 z-10 relative">
             <span className="text-2xl font-bold font-mono tracking-tight text-slate-100">{metrics.criticalAssets}</span>
             <span className="text-[9px] font-mono text-slate-500 font-semibold uppercase">WARNING/CRIT</span>
+          </div>
+          {/* Sparkline */}
+          <div className="h-10 w-full mt-3 opacity-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={assetData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="assetS" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#d97706" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#d97706" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke="#d97706" strokeWidth={1.5} fillOpacity={1} fill="url(#assetS)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Resilience Score Card */}
-        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 group relative">
+        <div className="bg-gradient-to-b from-industrial-900 to-industrial-950 border border-industrial-800/80 p-5 rounded-lg shadow-md hover:border-industrial-700/80 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-700/25 to-transparent" />
           <span className="text-[10px] text-slate-500 font-mono font-bold block mb-1">RESILIENCE SCORE</span>
-          <div className="flex justify-between items-baseline mt-1.5">
+          <div className="flex justify-between items-baseline mt-1.5 z-10 relative">
             <span className="text-2xl font-bold font-mono tracking-tight text-slate-100">{metrics.resilienceScore}/100</span>
             <span className="text-[9px] font-mono text-slate-500 font-semibold uppercase">STRUCTURAL</span>
+          </div>
+          {/* Sparkline */}
+          <div className="h-10 w-full mt-3 opacity-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={resilienceData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="resS" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke="#7c3aed" strokeWidth={1.5} fillOpacity={1} fill="url(#resS)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
         
@@ -157,21 +249,21 @@ export default function CommandCenter({
                 
                 <ol className="flex flex-col gap-3.5 text-xs font-mono">
                   <li className="flex items-start gap-3">
-                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-350 shrink-0">1</span>
+                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-355 shrink-0">1</span>
                     <div>
                       <span className="font-semibold text-slate-250 block text-[11px]">Reduce load on M19 by 20%</span>
                       <span className="text-[10px] text-slate-500 block mt-0.5">Prevents secondary wear-induced thermal failure on adjacent laser cutter unit.</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-350 shrink-0">2</span>
+                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-355 shrink-0">2</span>
                     <div>
                       <span className="font-semibold text-slate-250 block text-[11px]">Shift Batch #482 from Line 3 to Line 2</span>
                       <span className="text-[10px] text-slate-500 block mt-0.5">Reroutes production flow of high-value parts, avoiding penalty windows.</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-350 shrink-0">3</span>
+                    <span className="w-5.5 h-5.5 rounded-full bg-industrial-800 border border-industrial-700 flex items-center justify-center font-bold text-[10px] text-slate-355 shrink-0">3</span>
                     <div>
                       <span className="font-semibold text-slate-250 block text-[11px]">Prioritize M17 Emergency Overhaul</span>
                       <span className="text-[10px] text-slate-500 block mt-0.5">Deploy maintenance crew immediately to address root bearing failures.</span>
@@ -186,7 +278,7 @@ export default function CommandCenter({
                   </div>
                   <div>
                     <span className="text-[9px] text-slate-500 block uppercase">Production Preserved</span>
-                    <span className="text-sm font-bold text-slate-255 mt-0.5 block">91%</span>
+                    <span className="text-sm font-bold text-slate-250 mt-0.5 block">91%</span>
                   </div>
                   <div>
                     <span className="text-[9px] text-slate-500 block uppercase">Estimated Loss Saved</span>
@@ -439,7 +531,7 @@ export default function CommandCenter({
             </span>
             <span>🖥️ ARGUS SYSTEM SYSLOG FEED (ACTIVE STREAM)</span>
           </div>
-          <span className="text-[9px] text-slate-500">SYSTEM TIME: LIVE</span>
+          <span className="text-[9px] text-slate-550 text-slate-500">SYSTEM TIME: LIVE</span>
         </h3>
         
         <div className="bg-industrial-950/80 border border-industrial-850 p-4 rounded-md flex flex-col gap-1.5 text-[10px] text-slate-400 overflow-y-auto max-h-[140px] leading-relaxed shadow-[inset_0_1.5px_4px_rgba(0,0,0,0.5)]">
