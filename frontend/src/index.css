@@ -1,44 +1,64 @@
 @import "tailwindcss";
 
 @theme {
-  --color-industrial-950: #050608;
-  --color-industrial-900: #0a0c10;
-  --color-industrial-850: #121620;
-  --color-industrial-800: #1a1f2c;
-  --color-industrial-750: #22293a;
-  --color-industrial-700: #2d374e;
-  --color-industrial-600: #384562;
-  --color-industrial-500: #4e6088;
-  --color-industrial-400: #7187b3;
-  --color-industrial-300: #9ab4e3;
-  --color-industrial-100: #f1f5f9;
+  /* Invert Slate palette for complete Light Mode compatibility */
+  --color-slate-50: #0f172a;
+  --color-slate-100: #0f172a;
+  --color-slate-200: #1e293b;
+  --color-slate-350: #334155;
+  --color-slate-300: #334155;
+  --color-slate-400: #475569;
+  --color-slate-450: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-550: #64748b;
+  --color-slate-600: #94a3b8;
+  --color-slate-650: #94a3b8;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-850: #f1f5f9;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #f8fafc;
 
-  --color-alarm-red: #f43f5e;
-  --color-alarm-amber: #f59e0b;
-  --color-alarm-green: #10b981;
-  --color-alarm-purple: #a855f7;
-  --color-alarm-blue: #3b82f6;
+  /* Invert Industrial palette for Light Theme panels */
+  --color-industrial-950: #f8fafc;
+  --color-industrial-900: #ffffff;
+  --color-industrial-850: #f1f5f9;
+  --color-industrial-800: #e2e8f0;
+  --color-industrial-750: #cbd5e1;
+  --color-industrial-700: #cbd5e1;
+  --color-industrial-600: #94a3b8;
+  --color-industrial-500: #64748b;
+  --color-industrial-400: #475569;
+  --color-industrial-300: #334155;
+  --color-industrial-100: #0f172a;
+
+  /* Refine alerts for crisp light mode contrast */
+  --color-alarm-red: #e11d48;
+  --color-alarm-amber: #d97706;
+  --color-alarm-green: #059669;
+  --color-alarm-purple: #7c3aed;
+  --color-alarm-blue: #2563eb;
 
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', 'monospace';
 }
 
 .react-flow__renderer {
-  background-color: #050608;
-  background-image: radial-gradient(circle at 50% 50%, #121620 1px, transparent 1px);
+  background-color: #ffffff;
+  background-image: radial-gradient(circle at 50% 50%, #e2e8f0 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 .react-flow__node {
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
 }
 
 .react-flow__handle {
   width: 10px !important;
   height: 10px !important;
-  background: #a855f7 !important;
-  border: 2px solid #0a0c10 !important;
+  background: #7c3aed !important;
+  border: 2px solid #ffffff !important;
 }
 
 .react-flow__edge-path {
@@ -58,38 +78,38 @@
 .edge-pulsing {
   stroke-dasharray: 6;
   animation: flowPulse 1.2s linear infinite;
-  stroke: #a855f7 !important; /* purple pulse for simulation */
-  filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.4));
+  stroke: #7c3aed !important; /* purple pulse for simulation */
+  filter: drop-shadow(0 0 3px rgba(124, 58, 237, 0.3));
 }
 
 .edge-failed {
   stroke-dasharray: 4;
   animation: flowPulse 1.8s linear infinite;
-  stroke: #f43f5e !important; /* red pulse for failure path */
-  filter: drop-shadow(0 0 4px rgba(244, 63, 94, 0.4));
+  stroke: #e11d48 !important; /* red pulse for failure path */
+  filter: drop-shadow(0 0 3px rgba(225, 29, 72, 0.3));
 }
 
 body {
   margin: 0;
-  background-color: #050608;
-  color: #f1f5f9;
+  background-color: #f8fafc;
+  color: #0f172a;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
 
-/* Modern Glass Panels */
+/* Modern Glass Panels - Light Mode */
 .glass-panel {
-  background: rgba(10, 12, 16, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-panel:hover {
-  border-color: rgba(168, 85, 247, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.05);
+  border-color: rgba(124, 58, 237, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(124, 58, 237, 0.03);
 }
 
 /* Custom scrollbars */
@@ -98,14 +118,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050608;
+  background: #f8fafc;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a1f2c;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d374e;
+  background: #94a3b8;
 }
 
 /* Gear Cluster Spinning Keyframes */
