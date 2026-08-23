@@ -192,27 +192,59 @@ export default function LiveTelemetry({ onTriggerWarning }: LiveTelemetryProps) 
 
             <div className="flex flex-col gap-3 font-mono text-xs">
               {/* Temp Readout */}
-              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex justify-between items-center">
-                <span className="text-slate-400">BEARING TEMPERATURE</span>
-                <span className={`text-base font-bold ${telemetry.temp > 85.0 ? 'text-alarm-red animate-pulse' : 'text-slate-200'}`}>
-                  {round(telemetry.temp, 1)} °C
-                </span>
+              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex flex-col gap-2">
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-slate-400">BEARING TEMPERATURE</span>
+                  <span className={`text-base font-bold ${telemetry.temp > 85.0 ? 'text-alarm-red animate-pulse' : 'text-slate-200'}`}>
+                    {round(telemetry.temp, 1)} °C
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-alarm-blue to-alarm-red transition-all duration-300 relative"
+                    style={{ width: `${Math.min(100, (telemetry.temp / 110) * 100)}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                  </div>
+                </div>
               </div>
 
               {/* Vib Readout */}
-              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex justify-between items-center">
-                <span className="text-slate-400">HOUSING VIBRATION</span>
-                <span className={`text-base font-bold ${telemetry.vib > 6.0 ? 'text-alarm-red animate-pulse' : 'text-slate-200'}`}>
-                  {round(telemetry.vib, 2)} mm/s
-                </span>
+              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex flex-col gap-2">
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-slate-400">HOUSING VIBRATION</span>
+                  <span className={`text-base font-bold ${telemetry.vib > 6.0 ? 'text-alarm-red animate-pulse' : 'text-slate-200'}`}>
+                    {round(telemetry.vib, 2)} mm/s
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-alarm-blue via-alarm-amber to-alarm-red transition-all duration-300 relative"
+                    style={{ width: `${Math.min(100, (telemetry.vib / 10) * 100)}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                  </div>
+                </div>
               </div>
 
               {/* Risk Readout */}
-              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex justify-between items-center">
-                <span className="text-slate-400">ML FAILURE PROBABILITY</span>
-                <span className={`text-base font-bold ${telemetry.risk > 80.0 ? 'text-alarm-red animate-pulse' : telemetry.risk > 30.0 ? 'text-alarm-amber' : 'text-alarm-green'}`}>
-                  {round(telemetry.risk, 1)}%
-                </span>
+              <div className="p-3 bg-industrial-950 border border-industrial-850 rounded-sm flex flex-col gap-2">
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-slate-400">ML FAILURE PROBABILITY</span>
+                  <span className={`text-base font-bold ${telemetry.risk > 80.0 ? 'text-alarm-red animate-pulse' : telemetry.risk > 30.0 ? 'text-alarm-amber' : 'text-alarm-green'}`}>
+                    {round(telemetry.risk, 1)}%
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 relative ${
+                      telemetry.risk > 80.0 ? 'bg-alarm-red' : telemetry.risk > 30.0 ? 'bg-alarm-amber' : 'bg-alarm-green'
+                    }`}
+                    style={{ width: `${telemetry.risk}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -80,7 +80,8 @@ export default function DigitalTwin({
       <div className="grid grid-cols-4 gap-6 items-stretch">
         
         {/* Left 3 Cols: Interactive React Flow Network Graph (3 Cols) */}
-        <div className="col-span-3 bg-industrial-900 border border-industrial-800/80 p-2 rounded-lg relative flex flex-col min-h-[480px] shadow-lg">
+        <div className="col-span-3 bg-industrial-900 border border-industrial-800/80 p-2 rounded-lg relative flex flex-col min-h-[480px] shadow-lg overflow-hidden">
+          <div className="radar-scan-line" />
           <div className="absolute top-4 left-4 z-10 bg-industrial-950/80 border border-industrial-800/60 p-2.5 rounded-md flex items-center gap-2 text-xs font-mono select-none backdrop-blur-sm shadow-md">
             <Radio className="w-4 h-4 text-alarm-green animate-pulse" />
             <span className="font-bold text-slate-200">ARGUS PLANT ALPHA NETWORK MAP</span>

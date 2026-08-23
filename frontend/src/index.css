@@ -184,3 +184,22 @@ body {
 .oscilloscope-wave {
   animation: gridScan 4s linear infinite;
 }
+
+/* Radar sweep scanning animation */
+@keyframes radarSweep {
+  0% { transform: translateY(0%); }
+  50% { transform: translateY(480px); }
+  100% { transform: translateY(0%); }
+}
+
+.radar-scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.4), transparent);
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
+  pointer-events: none;
+  z-index: 5;
+  animation: radarSweep 6s ease-in-out infinite;
+}
