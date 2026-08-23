@@ -30,6 +30,10 @@ ARGUS serves as a novel, decision-intelligent framework designed to protect thes
 * **The Public Challenge**: The push for full factory automation often removes human operators from the decision loop, leaving them vulnerable to unpredictable AI failures.
 * **The ARGUS Solution**: ARGUS enforces a strict **Human-in-the-Loop (HITL) Safety Layer**. The AI acts exclusively as an advisor, generating optimized strategy recommendations and presenting them to the operator for confirmation. This ensures that final authority remains with human experts, protecting workplace safety and preventing erratic autonomous behavior.
 
+### F. Public Transit Safety & Heavy Industrial Incident Prevention
+* **The Public Challenge**: Mass transportation and heavy chemical refining are plagued by high-consequence failure incidents, such as recent aviation disasters and railway signal failures in India, as well as daily industrial boiler explosions. In these environments, a single mechanical failure (such as a turbine bearing jam, a faulty hydraulic seal, or a stuck electrical relay) cascades into system-wide losses. Traditional systems alert operators only when a failure has already occurred, leaving no time to avoid disaster and protect human lives.
+* **The ARGUS Solution**: ARGUS shifts the focus from "reactive logging" to "proactive prediction." By continuously monitoring high-frequency telemetry (such as turbine vibrations or hydraulic lines), running XGBoost classifiers to flag early wear trends, and using topological graphs to map dependencies, ARGUS simulates the cascade path before it triggers a system collapse. It immediately recommends containment actions (such as adjusting flight control trim, re-routing rail grid lines, or throttling compressor loads) to ensure public transit operators and refinery engineers can prevent disasters before they become irreversible.
+
 ---
 
 ## 2. DETAILED PROBLEM STATEMENT & THE COGNITIVE GAP IN INDUSTRY
